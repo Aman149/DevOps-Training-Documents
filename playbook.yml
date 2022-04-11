@@ -1,0 +1,33 @@
+---
+
+- name: manage webserver
+  remote_user: training
+  gather_facts: false
+  become: true
+  hosts: jenkins
+  vars:
+    doc_root: '/var/www/html'
+
+  handlers:
+  - name: restart_webservice
+    service:
+       name: "{{ service_name }}"
+       state: restarted
+
+
+  tasks:
+  - name: install webserver package
+    package:
+       name: "{{ package_name }}"
+       state: present
+  - name: manage webservice
+    service:
+       name: "{{ service_name }}"
+       state: started
+  - name: deploy site
+    copy:
+       src: index.html
+       dest: "{{ doc_root }}"
+    notify:
+       - restart_webservice
+
